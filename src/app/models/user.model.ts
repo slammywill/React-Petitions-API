@@ -12,6 +12,15 @@ const getUserByEmail = async (email: string) : Promise<User[]> => {
     return rows;
 };
 
+const getUserById = async (id: number) : Promise<User[]> => {
+    Logger.info(`Getting user with id ${id}`);
+    const conn = await getPool().getConnection();
+    const query = 'SELECT * FROM user WHERE id = ?';
+    const [ rows ] = await conn.query(query, [ id ]);
+    await conn.release();
+    return rows;
+}
+
 const insert = async (email: string, firstName: string, lastName: string, password: string)
     : Promise<ResultSetHeader> => {
     Logger.info(`Adding username with email ${email} to the database`);
@@ -23,5 +32,5 @@ const insert = async (email: string, firstName: string, lastName: string, passwo
 }
 
 
-export {getUserByEmail, insert}
+export {getUserByEmail, getUserById, insert}
 
