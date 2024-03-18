@@ -31,6 +31,14 @@ const insert = async (email: string, firstName: string, lastName: string, passwo
     return result;
 }
 
+const updateToken = async (id: number, token: string) : Promise<ResultSetHeader> => {
+    const conn = await getPool().getConnection();
+    const query = 'UPDATE user SET auth_token = ? WHERE id = ?';
+    const [ result ] = await conn.query(query, [ token, id ]);
+    await conn.release();
+    return result;
+}
 
-export {getUserByEmail, getUserById, insert}
+
+export {getUserByEmail, getUserById, insert, updateToken}
 
