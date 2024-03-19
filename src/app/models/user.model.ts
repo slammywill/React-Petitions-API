@@ -1,6 +1,7 @@
 import { getPool } from '../../config/db';
 import Logger from '../../config/logger';
 import { ResultSetHeader } from 'mysql2';
+import jwt, {JwtPayload} from "jsonwebtoken";
 
 
 const getUserByEmail = async (email: string) : Promise<User[]> => {
@@ -39,6 +40,70 @@ const updateToken = async (id: number, token: string) : Promise<ResultSetHeader>
     return result;
 }
 
+const getUserIdByToken = async (token:string) : Promise<string> => {
+    const decodedToken: JwtPayload | string = jwt.decode(token);
+    let tokenId = null;
+    if (typeof decodedToken === 'object') {
+        tokenId = (decodedToken as JwtPayload).id;
+    }
+    return tokenId.toString();
+}
 
-export {getUserByEmail, getUserById, insert, updateToken}
+const checkIdIsValid = async (id:number) : Promise<boolean> => {
+    // Checks if the provided id is a number.
+    if (isNaN(id)) {
+        return false;
+    }
+    // Checks if there is a user with the provided id.
+    const result = await getUserById(id);
+    if (result.length === 0) {
+        return false;
+    }
+    return true;
+}
+
+const updateEmail = async (id: number, email:string): Promise<ResultSetHeader> => {
+    const conn = await getPool().getConnection();
+    const query = 'UPDATE user SET email = ? WHERE id = ?';
+    const [ result ] = await conn.query(query, [ email, id ]);
+    await conn.release();
+    return result;
+}
+
+const updateFirstName = async (id: number, firstName:string): Promise<ResultSetHeader> => {
+    const conn = await getPool().getConnection();
+    const query = 'UPDATE user SET first_name = ? WHERE id = ?';
+    const [ result ] = await conn.query(query, [ firstName, id ]);
+    await conn.release();
+    return result;
+}
+
+const updateLastName = async (id: number, lastName:string): Promise<ResultSetHeader> => {
+    const conn = await getPool().getConnection();
+    const query = 'UPDATE user SET last_name = ? WHERE id = ?';
+    const [ result ] = await conn.query(query, [ lastName, id ]);
+    await conn.release();
+    return result;
+}
+
+const updatePassword = async (id: number, password:string): Promise<ResultSetHeader> => {
+    const conn = await getPool().getConnection();
+    const query = 'UPDATE user SET password = ? WHERE id = ?';
+    const [ result ] = await conn.query(query, [ password, id]);
+    await conn.release();
+    return result;
+}
+
+
+export {getUserByEmail,
+    getUserById,
+    insert,
+    updateToken,
+    getUserIdByToken,
+    checkIdIsValid,
+    updateEmail,
+    updatePassword,
+    updateFirstName,
+    updateLastName
+}
 
