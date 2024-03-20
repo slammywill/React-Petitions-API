@@ -94,6 +94,14 @@ const updatePassword = async (id: number, password:string): Promise<ResultSetHea
     return result;
 }
 
+const updateImageFilename = async (id:number, filename:string): Promise<ResultSetHeader> => {
+    const conn = await getPool().getConnection();
+    const query = 'UPDATE user SET image_filename = ? WHERE id = ?';
+    const [ result ] = await conn.query(query, [ filename, id]);
+    await conn.release();
+    return result;
+}
+
 
 export {getUserByEmail,
     getUserById,
@@ -104,6 +112,7 @@ export {getUserByEmail,
     updateEmail,
     updatePassword,
     updateFirstName,
-    updateLastName
+    updateLastName,
+    updateImageFilename
 }
 
