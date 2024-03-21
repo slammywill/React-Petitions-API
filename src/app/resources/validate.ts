@@ -3,6 +3,10 @@ import addFormats from 'ajv-formats';
 const ajv = new Ajv({removeAdditional: 'all', strict: false});
 addFormats(ajv);
 
+ajv.addFormat("integer", (data) => {
+    return Number.isInteger(Number(data));
+});
+
 const validate = async(schema: object, data: any) => {
     try {
         const validator = ajv.compile(schema);

@@ -22,7 +22,8 @@
     "ajv-formats": "^2.1.1",
     "jsonwebtoken": "^9.0.2",
     "bcrypt": "5.1.1",
-    "mime-types": "^2.1.35"
+    "mime-types": "^2.1.35",
+    "knex": "^3.1.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.14",
