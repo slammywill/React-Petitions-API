@@ -10,9 +10,9 @@ const getSubset = async (
     supporterId: number,
     sortBy: string) : Promise<Petition[]> => {
     const queryBuilder = knexInstance('petition AS p')
-        .join('support_tier AS st', 'p.id', 'st.petition_id')
-        .join('user AS u', 'p.owner_id', 'u.id')
-        .join('supporter as s', 's.petition_id', 'p.id')
+        .leftJoin('support_tier AS st', 'p.id', 'st.petition_id')
+        .leftJoin('user AS u', 'p.owner_id', 'u.id')
+        .leftJoin('supporter as s', 's.petition_id', 'p.id')
         .select(
             'p.id AS petitionId',
             'p.title',
@@ -66,11 +66,11 @@ const getSubset = async (
 
 const getById = async (id: number) : Promise<Petition> => {
     const query = knexInstance('petition AS p')
-        .join('support_tier AS st', 'p.id', 'st.petition_id')
-        .join('user AS u', 'p.owner_id', 'u.id')
-        .join('supporter as s', 's.petition_id', 'p.id')
+        .leftJoin('support_tier AS st', 'p.id', 'st.petition_id')
+        .leftJoin('user AS u', 'p.owner_id', 'u.id')
+        .leftJoin('supporter as s', 's.petition_id', 'p.id')
         .select(
-            'p.id AS petitionID',
+            'p.id AS petitionId',
             'p.title AS title',
             'p.category_id AS categoryId',
             'u.id AS ownerId',
@@ -85,7 +85,77 @@ const getById = async (id: number) : Promise<Petition> => {
     return (await query)[0];
 }
 
+const insert = async (ownerId: number, title: string, description: string, categoryId: string) : Promise<number> => {
+    const query = knexInstance('petition').insert(
+        {
+            'owner_id': ownerId,
+            'title': title,
+            'description': description,
+            'category_id': categoryId,
+            'creation_date': new Date()
+        });
+    return (await query)[0];
+}
+
+const getByTitle = async (title: string) : Promise<Petition[]> => {
+    const query = knexInstance('petition')
+        .select("*")
+    .where('title', title);
+    return (await query);
+}
+
+const updateTitle = async (id: number, title:string) : Promise<void> => {
+    const query = knexInstance('petition')
+        .where('id', id)
+        .update('title', title);
+    await query;
+}
+
+const updateDescription = async (id: number, description:string) : Promise<void> => {
+    const query = knexInstance('petition')
+        .where('id', id)
+        .update('description', description);
+    await query;
+}
+
+const updateCategoryId = async (id: number, categoryId:number) : Promise<void> => {
+    const query = knexInstance('petition')
+        .where('id', id)
+        .update('category_id', categoryId);
+    await query;
+}
+
+const deletePetition = async (id:number) : Promise<void> => {
+    const query = knexInstance('petition')
+        .where('id', id)
+        .del();
+    await query;
+}
+
+const getPetitionWithFilename = async (id:number) : Promise<Petition> => {
+    const query = knexInstance('petition')
+        .select('id',
+            'image_filename AS imageFilename')
+        .where('id', id);
+    return (await query)[0];
+}
+
+const updateImageFilename = async (id:number, imageFilename: string) : Promise<void> => {
+    const query = knexInstance('petition')
+        .where('id', id)
+        .update('image_filename', imageFilename);
+    await query;
+}
+
 export {
     getSubset,
-    getById
+    getById,
+    insert,
+    updateTitle,
+    updateDescription,
+    updateCategoryId,
+    getByTitle,
+    deletePetition,
+    getPetitionWithFilename,
+    updateImageFilename
 }

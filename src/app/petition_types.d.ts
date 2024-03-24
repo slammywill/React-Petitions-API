@@ -9,5 +9,6 @@ type Petition = {
     creationDate: string,
     description: string,
     moneyRaised: number,
+    imageFilename: string,
     supportTiers: SupportTier[]
 }
