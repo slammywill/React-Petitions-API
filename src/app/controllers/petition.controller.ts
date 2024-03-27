@@ -5,9 +5,7 @@ import * as support_tiers from '../models/support_tier.model';
 import * as categories from '../models/cateory.model';
 import {validate} from "../resources/validate";
 import * as schemas from "../resources/schemas.json";
-import logger from "../../config/logger";
 import {getUserIdByToken} from "../models/user.model";
-import {getByPetitionId} from "../models/support_tier.model";
 
 const getAllPetitions = async (req: Request, res: Response): Promise<void> => {
     try{
@@ -21,15 +19,28 @@ const getAllPetitions = async (req: Request, res: Response): Promise<void> => {
         const startIndex = parseInt(req.query.startIndex as string, 10);
         const count = parseInt(req.query.count as string, 10);
         const q = req.query.q as string;
-        const categoryIdsStrings = req.query.categoryIds as string[];
+        const categoryIdsStrings = req.query.categoryIds as string;
         const supportingCost = parseInt(req.query.supportingCost as string, 10);
         const ownerId = parseInt(req.query.ownerId as string, 10);
         const supporterId = parseInt(req.query.supporterId as string, 10);
         const sortBy = req.query.sortBy as string;
 
-        let categoryIds: number[];
+        const categoryIds: number[] = [];
         if (categoryIdsStrings !== undefined) {
-            categoryIds = categoryIdsStrings.map(str => parseInt(str, 10));
+            for (const id of categoryIdsStrings) {
+                categoryIds.push(parseInt(id, 10));
+            }
+        }
+        const allCategories = await categories.getAll();
+        const allCategoryIds: number[] = [];
+        for (const category of allCategories) {
+            allCategoryIds.push(category.id);
+        }
+        for (const id of categoryIds) {
+            if (!allCategoryIds.includes(id)) {
+                res.statusMessage = "Bad Request";
+                res.status(400).send();
+            }
         }
 
         let result = await petitions.getSubset(
@@ -54,7 +65,7 @@ const getAllPetitions = async (req: Request, res: Response): Promise<void> => {
         }
 
         if (!isNaN(count)) {
-            if (count < result.length) {
+            if (count <= result.length) {
                 result = result.slice(0, count);
             } else {
                 res.statusMessage = 'Bad Request: Count larger than # of query results';
@@ -79,6 +90,13 @@ const getAllPetitions = async (req: Request, res: Response): Promise<void> => {
 const getPetition = async (req: Request, res: Response): Promise<void> => {
     try{
         const petitionId = req.params.id;
+
+        if (isNaN(parseInt(petitionId, 10))) {
+            res.statusMessage = `Bad request`;
+            res.status(400).send();
+            return;
+        }
+
         const result = await petitions.getById(parseInt(petitionId, 10));
 
         if (!result) {
@@ -87,6 +105,7 @@ const getPetition = async (req: Request, res: Response): Promise<void> => {
             return;
         }
         const tiers = await support_tiers.getByPetitionId(parseInt(petitionId, 10));
+        const moneyRaised = await petitions.getMoneyRaisedByPetitionId(parseInt(petitionId, 10));
 
         res.statusMessage = 'OK';
         res.status(200).send({
@@ -99,7 +118,7 @@ const getPetition = async (req: Request, res: Response): Promise<void> => {
             "numberOfSupporters": result.numberOfSupporters,
             "creationDate": result.creationDate,
             "description": result.description,
-            "moneyRaised": result.moneyRaised,
+            moneyRaised,
             "supportTiers": tiers});
         return;
 

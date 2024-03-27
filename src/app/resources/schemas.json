@@ -136,13 +136,13 @@
         "anyOf": [
           {
             "type": "string",
-            "format": "int64"
+            "format": "integer"
           },
           {
             "type": "array",
             "items": {
               "type": "string",
-              "format": "int64"
+              "format": "integer"
             }
           }
         ]
@@ -166,7 +166,7 @@
       },
       "categoryId": {
         "type": "number",
-        "format": "int64",
+        "format": "integer",
         "minimum": 0,
         "nullable": false
       },
@@ -230,7 +230,7 @@
       },
       "categoryId": {
         "type": "number",
-        "format": "int64",
+        "format": "integer",
         "minimum": 0,
         "nullable": false
       }
@@ -242,7 +242,7 @@
     "properties": {
       "supportTierId": {
         "type": "number",
-        "format": "int64",
+        "format": "integer",
         "minimum": 1,
         "nullable": false
       },
@@ -275,7 +275,7 @@
       },
       "cost": {
         "type": "number",
-        "format": "int64",
+        "format": "integer",
         "minimum": 0,
         "nullable": false
       }
@@ -304,7 +304,7 @@
       },
       "cost": {
         "type": "number",
-        "format": "int64",
+        "format": "integer",
         "minimum": 0,
         "nullable": false
       }

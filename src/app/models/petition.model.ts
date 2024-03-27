@@ -1,5 +1,5 @@
 import {knexInstance} from "../../config/db";
-
+import Logger from '../../config/logger';
 const getSubset = async (
     startIndex: number,
     count: number,
@@ -78,11 +78,25 @@ const getById = async (id: number) : Promise<Petition> => {
             'u.last_name AS ownerLastName',
             knexInstance.raw('(SELECT COUNT(*) FROM supporter s WHERE s.petition_id = p.id) AS numberOfSupporters'),
             'p.creation_date AS creationDate',
-            'p.description AS description',
-            knexInstance.raw('(SELECT SUM(cost) FROM support_tier s WHERE s.petition_id = p.id) AS moneyRaised'),
-            )
+            'p.description AS description')
         .where('p.id', id);
     return (await query)[0];
+}
+
+const getMoneyRaisedByPetitionId = async (id: number) : Promise<number> => {
+    const query = knexInstance('support_tier AS st')
+        .join('supporter AS s', 's.support_tier_id', 'st.id')
+        .select(knexInstance.raw('(SELECT SUM(cost)) AS moneyRaised'))
+        .where('s.petition_id', id);
+
+    const result = (await query)[0];
+    // @ts-ignore
+    if (!result.moneyRaised) {
+    return 0;
+    } else {
+        // @ts-ignore
+        return parseInt(result.moneyRaised, 10);
+    }
 }
 
 const insert = async (ownerId: number, title: string, description: string, categoryId: string) : Promise<number> => {
@@ -157,5 +171,6 @@ export {
     getByTitle,
     deletePetition,
     getPetitionWithFilename,
-    updateImageFilename
+    updateImageFilename,
+    getMoneyRaisedByPetitionId
 }

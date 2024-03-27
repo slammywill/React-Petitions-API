@@ -1,7 +1,7 @@
 import {knexInstance} from "../../config/db";
 
 const getAll = async () : Promise<Category[]> => {
-    return (await knexInstance.select('id as categoryId', 'name')
+    return (await knexInstance.select('id', 'name')
         .from('category'));
 }
 

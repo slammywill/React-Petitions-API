@@ -24,6 +24,12 @@ const insert = async (petitionId: number, title: string, description: string, co
     await query;
 }
 
+const getAll = async () : Promise<SupportTier[]> => {
+    const query = knexInstance('support_tier')
+        .select("*")
+    return (await query);
+}
+
 const getByTitle = async (title: string, petitionId: number) : Promise<SupportTier[]> => {
     const query = knexInstance('support_tier')
         .select("*")
@@ -74,5 +80,6 @@ export {
     updateDescription,
     updateTitle,
     updateCost,
-    deleteSupportTier
+    deleteSupportTier,
+    getAll
 }

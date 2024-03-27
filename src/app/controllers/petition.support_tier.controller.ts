@@ -93,6 +93,17 @@ const editSupportTier = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
+        const supportTiers = await support_tiers.getAll();
+        const supportTierIds: number[] = [];
+        for (const st of supportTiers) {
+            supportTierIds.push(st.id);
+        }
+        if (!supportTierIds.includes(parseInt(supportTierId, 10))) {
+            res.statusMessage = `Bad request`;
+            res.status(400).send();
+            return;
+        }
+
         const title = req.body.title;
         const description = req.body.description;
         const cost = req.body.cost;

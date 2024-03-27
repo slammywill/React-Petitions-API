@@ -1,16 +1,14 @@
-import { getPool } from '../../config/db';
+import {getPool, knexInstance} from '../../config/db';
 import Logger from '../../config/logger';
 import { ResultSetHeader } from 'mysql2';
 import jwt, {JwtPayload} from "jsonwebtoken";
 
 
 const getUserByEmail = async (email: string) : Promise<User[]> => {
-    Logger.info(`Getting user with email ${email}`);
-    const conn = await getPool().getConnection();
-    const query = 'SELECT * FROM user WHERE email = ?';
-    const [ rows ] = await conn.query(query, [ email ]);
-    await conn.release();
-    return rows;
+    const query = knexInstance('user')
+        .select('*')
+        .where('email', email);
+    return await query;
 };
 
 const getUserById = async (id: number) : Promise<User[]> => {
