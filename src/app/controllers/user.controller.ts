@@ -8,21 +8,21 @@ import jwt, {JwtPayload} from "jsonwebtoken";
 import {getUserById, getUserIdByToken} from "../models/user.model";
 
 const register = async (req: Request, res: Response): Promise<void> => {
-  const email = req.body.email;
-  const firstName = req.body.firstName;
-  const lastName = req.body.lastName;
-  const password = req.body.password;
-  const hashedPassword = await passwords.hash(password);
-
-  // Checks that the provided data is valid.
-  Logger.http("POST: Register a new user");
-  const validation = await validate(schemas.user_register, req.body);
-  if (validation !== true) {
-    res.statusMessage = `Bad request: Invalid information`;
-    res.status(400).send();
-    return;
-  }
   try {
+    const email = req.body.email;
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+    const password = req.body.password;
+    const hashedPassword = await passwords.hash(password);
+
+    // Checks that the provided data is valid.
+    Logger.http("POST: Register a new user");
+    const validation = await validate(schemas.user_register, req.body);
+    if (validation !== true) {
+      res.statusMessage = `Bad request: Invalid information`;
+      res.status(400).send();
+      return;
+    }
     // Checks if the email is already in use.
     const emailTakenResult = await users.getUserByEmail(email);
     if (emailTakenResult.length !== 0) {
