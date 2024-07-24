@@ -1,5 +1,9 @@
 # SENG365 Assignment 1 API Server (Petition Site)
 
+## About
+
+This is my implementation of the SENG365 Assignment 1, in which we created an API using express.js. This is used in conjunction with [SENG365 Assignment 2](https://github.com/slammywill/React-Petitions-Frontend-App), the frontend application, to create a fullstack application that allows users to create, view and manage petitions, such as to help fund development of a local park. Users can also support these petitons at different tiers.
+
 ## Running locally
 
 1. Use `npm install` to populate the `node_modules/` directory with up-to-date packages
